@@ -1,0 +1,64 @@
+# =========================
+# Operating System Files
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =========================
+# Build & Compilation Results (.NET)
+# =========================
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio / Rider / Omnisharp cache
+.vs/
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+
+# NuGet Packages & Caches
+*.nupkg
+*.snupkg
+**/packages/
+!**/packages/build/
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# =========================
+# Database & Temporary Files
+# =========================
+*.db-shm
+*.db-wal
+*.sqlite-shm
+*.sqlite-wal
+
+# =========================
+# Publishing & Crash Dumps
+# =========================
+*.publishsettings
+publish/
+*.crash
+*.dump
+
+# =========================
+# Tooling & Scratch
+# =========================
+.gemini/
+scratch/
