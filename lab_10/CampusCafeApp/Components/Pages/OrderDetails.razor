@@ -1,0 +1,62 @@
+@page "/orders/{Id:int}"
+@inject PurchaseService Purchases
+@inject ILogger<OrderDetails> Logger
+
+<PageTitle>Деталі замовлення</PageTitle>
+<h1>Замовлення №@Id</h1>
+@if (error is not null) { <p role="alert">@error</p> }
+else if (loading) { <p role="status">Завантаження…</p> }
+else if (order is null) { <p>Такого замовлення немає.</p> }
+else
+{
+    <article class="panel">
+        <p>Створено: @order.CreatedUtc.ToString("dd.MM.yyyy HH:mm") UTC</p>
+        <ul class="review-lines">
+            @foreach (var item in order.Items)
+            {
+                <li @key="item.Id">
+                    <strong>@item.ProductName</strong>
+                    <span>@item.Options · @item.Quantity шт.</span>
+                    <MoneyLabel Amount="item.Total" />
+                </li>
+            }
+        </ul>
+        <p class="review-total">Разом: <MoneyLabel Amount="order.Total" /></p>
+        <p>Замовлення збережено. Оплата не проводилася.</p>
+        @if (!string.IsNullOrEmpty(order.CustomerName))
+        {
+            <h2>Отримання</h2>
+            <p>@order.CustomerName · @order.Phone</p>
+            <p>@(string.IsNullOrEmpty(order.DeliveryAddress) ? "Самовивіз" : order.DeliveryAddress)</p>
+            @if (!string.IsNullOrEmpty(order.Comment)) { <p>@order.Comment</p> }
+        }
+    </article>
+}
+<a class="back-link" href="/orders">До списку замовлень</a>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private PurchaseOrder? order;
+    private bool loading = true;
+    private string? error;
+    private int loadVersion;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var version = ++loadVersion;
+        loading = true;
+        error = null;
+        order = null;
+        try
+        {
+            var result = await Purchases.GetAsync(Id);
+            if (version == loadVersion) order = result;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Не вдалося отримати замовлення {Id}", Id);
+            if (version == loadVersion) error = "Помилка читання даних. Це не означає, що замовлення відсутнє.";
+        }
+        finally { if (version == loadVersion) loading = false; }
+    }
+}
