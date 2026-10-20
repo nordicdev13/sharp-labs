@@ -1,0 +1,56 @@
+@page "{id:int}"
+@model RazorPagesCar.Pages.Admin.Reviews.ReplyModel
+@{
+    ViewData["Title"] = "Відповідь на відгук";
+}
+
+<a asp-page="./Index" class="btn btn-outline-secondary mb-3">&larr; До списку відгуків</a>
+
+<h1 class="mb-3 fw-bold">Відповідь на відгук</h1>
+
+@if (Model.Review is null)
+{
+    <div class="alert alert-danger">Відгук не знайдено.</div>
+}
+else
+{
+    <div class="card border-0 shadow-sm mb-4 bg-light">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">Інформація про відгук</h5>
+            <div class="mb-2"><strong>Автомобіль:</strong> @Model.CarTitle</div>
+            <div class="mb-2"><strong>Автор:</strong> @(Model.Review.ReviewerName ?? "Користувач")</div>
+            <div class="mb-2"><strong>Оцінка:</strong> <span class="badge bg-warning text-dark">★ @Model.Review.Rating</span></div>
+            <div class="mb-2"><strong>Коментар клієнта:</strong> @(!string.IsNullOrWhiteSpace(Model.Review.Comment) ? Model.Review.Comment : "—")</div>
+            <div class="text-muted small">Створено: @(Model.Review.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm"))</div>
+        </div>
+    </div>
+
+    <form method="post" class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Input.AdminReply" class="form-label fw-bold"></label>
+                <textarea asp-for="Input.AdminReply" id="Input_AdminReply" class="form-control" rows="5" placeholder="Введіть текст офіційної відповіді адміністратора..."></textarea>
+                <span asp-validation-for="Input.AdminReply" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary px-4" type="submit">Зберегти відповідь</button>
+                <a class="btn btn-outline-secondary" asp-page="./Index">Скасувати</a>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Review.AdminReply))
+                {
+                    <button class="btn btn-outline-danger ms-auto" type="submit"
+                            onclick="document.getElementById('Input_AdminReply').value='';">
+                        Очистити відповідь
+                    </button>
+                }
+            </div>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

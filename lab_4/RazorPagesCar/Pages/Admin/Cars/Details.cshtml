@@ -1,0 +1,65 @@
+@page "{id:int}"
+@model RazorPagesCar.Pages.Admin.Cars.DetailsModel
+
+@{
+    ViewData["Title"] = "Деталі авто";
+}
+
+<h1>Детальна інформація</h1>
+
+<div>
+    <h4>Легковий автомобіль (Адміністративна панель)</h4>
+    <hr />
+    
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <img src="@(string.IsNullOrEmpty(Model.Car.PosterPath) ? Url.Content("~/images/placeholder-poster.svg") : Url.Content(Model.Car.PosterPath))"
+                 class="img-fluid rounded border shadow-sm w-100"
+                 style="object-fit:cover; aspect-ratio: 16/10;" />
+        </div>
+        <div class="col-md-8">
+            <dl class="row">
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Make)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Make)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Model)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Model)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Year)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Year)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Price)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Price)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.BodyType)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.BodyType)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Color)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Color)
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="mt-3">
+    <a asp-page="./Edit" asp-route-id="@Model.Car.Id" class="btn btn-primary">Редагувати</a>
+    <a asp-page="./Index" class="btn btn-secondary">Повернутися до списку</a>
+</div>

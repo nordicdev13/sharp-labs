@@ -1,0 +1,60 @@
+@page "{id:int}"
+@model RazorPagesCar.Pages.Admin.Feedback.ReplyModel
+@{
+    ViewData["Title"] = "Відповідь на звернення";
+}
+
+<a asp-page="./Index" class="btn btn-outline-secondary mb-3">&larr; До списку звернень</a>
+
+<h1 class="mb-3 fw-bold">Відповідь на звернення</h1>
+
+@if (Model.Item is null)
+{
+    <div class="alert alert-danger">Запис не знайдено.</div>
+}
+else
+{
+    <div class="card border-0 shadow-sm mb-4 bg-light">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">Деталі звернення</h5>
+            <div class="mb-2"><strong>Від:</strong> @Model.Item.Name (<a href="mailto:@Model.Item.Email">@Model.Item.Email</a>)</div>
+            <div class="mb-2"><strong>Тема:</strong> @Model.Item.Subject</div>
+            <div class="mt-2"><strong>Повідомлення клієнта:</strong><br />@Model.Item.Message</div>
+            <div class="text-muted small mt-2">Отримано: @Model.Item.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+
+            @if (Model.Item.AdminRepliedAt != null)
+            {
+                <hr />
+                <div class="text-success small fw-semibold">Попередню відповідь надіслано: @Model.Item.AdminRepliedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") (@Model.Item.AdminRepliedBy)</div>
+                <div><strong>Тема попередньої відповіді:</strong> @Model.Item.AdminReplySubject</div>
+                <div class="mt-2 p-2 bg-white rounded border small" style="white-space:pre-wrap;">@Model.Item.AdminReplyBody</div>
+            }
+        </div>
+    </div>
+
+    <form method="post" asp-page-handler="Send" class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">Надіслати електронного листа</h5>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Subject" class="form-label fw-bold"></label>
+                <input asp-for="Input.Subject" class="form-control" />
+                <span asp-validation-for="Input.Subject" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Body" class="form-label fw-bold"></label>
+                <textarea asp-for="Input.Body" class="form-control" rows="8"></textarea>
+                <span asp-validation-for="Input.Body" class="text-danger"></span>
+            </div>
+
+            <button class="btn btn-primary px-4" type="submit">Надіслати відповідь</button>
+            <a class="btn btn-outline-secondary" asp-page="./Index">Скасувати</a>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

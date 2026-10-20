@@ -1,0 +1,68 @@
+@page "{id:int}"
+@model RazorPagesCar.Pages.Admin.Cars.DeleteModel
+
+@{
+    ViewData["Title"] = "Видалити авто";
+}
+
+<h1>Видалити</h1>
+
+<h3>Ви впевнені, що хочете видалити цей автомобіль?</h3>
+<div>
+    <h4>Легковий автомобіль (Адміністративна панель)</h4>
+    <hr />
+    
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <img src="@(string.IsNullOrEmpty(Model.Car.PosterPath) ? Url.Content("~/images/placeholder-poster.svg") : Url.Content(Model.Car.PosterPath))"
+                 class="img-fluid rounded border"
+                 style="object-fit:cover; aspect-ratio: 16/10;" />
+        </div>
+        <div class="col-md-9">
+            <dl class="row">
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Make)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Make)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Model)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Model)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Year)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Year)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Price)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Price)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.BodyType)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.BodyType)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Car.Color)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Car.Color)
+                </dd>
+            </dl>
+        </div>
+    </div>
+    
+    <form method="post" class="mt-3">
+        <input type="hidden" asp-for="Car.Id" />
+        <input type="submit" value="Видалити" class="btn btn-danger px-4" />
+        <a asp-page="./Index" class="btn btn-secondary">Повернутися до списку</a>
+    </form>
+</div>

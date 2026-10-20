@@ -1,0 +1,69 @@
+@page
+@model RazorPagesCar.Pages.Admin.Cars.CreateModel
+
+@{
+    ViewData["Title"] = "Додати авто";
+}
+
+<h1>Додати авто</h1>
+
+<h4>Легковий автомобіль (Адміністративна панель)</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Car.Make" class="control-label fw-bold"></label>
+                <input asp-for="Car.Make" class="form-control" />
+                <span asp-validation-for="Car.Make" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Car.Model" class="control-label fw-bold"></label>
+                <input asp-for="Car.Model" class="form-control" />
+                <span asp-validation-for="Car.Model" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Car.Year" class="control-label fw-bold"></label>
+                <input asp-for="Car.Year" class="form-control" />
+                <span asp-validation-for="Car.Year" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Car.Price" class="control-label fw-bold"></label>
+                <input asp-for="Car.Price" class="form-control" />
+                <span asp-validation-for="Car.Price" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Car.BodyType" class="control-label fw-bold"></label>
+                <input asp-for="Car.BodyType" class="form-control" />
+                <span asp-validation-for="Car.BodyType" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Car.Color" class="control-label fw-bold"></label>
+                <input asp-for="Car.Color" class="form-control" />
+                <span asp-validation-for="Car.Color" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label fw-bold">Фото автомобіля (jpg, png, webp, до 2 МБ)</label>
+                <input asp-for="PosterFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                <span class="text-danger" asp-validation-for="PosterFile"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <input type="submit" value="Створити" class="btn btn-primary px-4" />
+                <a asp-page="Index" class="btn btn-secondary">Повернутися до списку</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#e9ecef"/>
+      <stop offset="1" stop-color="#f8f9fa"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="900" fill="url(#g)"/>
+  <g fill="#adb5bd" font-family="Segoe UI, Roboto, sans-serif" text-anchor="middle">
+    <rect x="150" y="250" width="300" height="300" rx="20" fill="#dee2e6"/>
+    <circle cx="300" cy="400" r="80" fill="#ced4da"/>
+    <text x="300" y="600" font-size="36">Фото відсутнє</text>
+  </g>
+</svg>

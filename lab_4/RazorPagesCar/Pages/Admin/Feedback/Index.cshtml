@@ -1,0 +1,79 @@
+@page
+@model RazorPagesCar.Pages.Admin.Feedback.IndexModel
+@{
+    ViewData["Title"] = "Звернення громадян (адмін)";
+}
+
+<h1 class="mb-3 fw-bold">Звернення користувачів</h1>
+
+@if (TempData["Ok"] is string message)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @message
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form method="get" class="row g-2 align-items-end mb-4 bg-light p-3 rounded shadow-sm">
+    <div class="col-12 col-md-6">
+        <label class="form-label fw-semibold" for="q">Пошук звернень</label>
+        <input id="q" name="q" value="@Model.q" class="form-control" placeholder="Ім’я, email, тема або текст звернення..." />
+    </div>
+    <div class="col-6 col-md-3 form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="onlyUnreplied" name="onlyUnreplied" value="true" @(Model.onlyUnreplied ? "checked" : "") />
+        <label class="form-check-label fw-semibold" for="onlyUnreplied">Лише без відповіді</label>
+    </div>
+    <div class="col-6 col-md-3">
+        <button class="btn btn-primary w-100">Фільтрувати</button>
+    </div>
+</form>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="alert alert-info">Звернень не знайдено.</div>
+}
+else
+{
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Дата</th>
+                    <th>Від кого</th>
+                    <th>Email</th>
+                    <th>Тема</th>
+                    <th>Повідомлення</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var it in Model.Items)
+                {
+                    <tr>
+                        <td><small class="text-muted">@it.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small></td>
+                        <td class="fw-semibold">@it.Name</td>
+                        <td><a href="mailto:@it.Email" class="text-decoration-none">@it.Email</a></td>
+                        <td>@it.Subject</td>
+                        <td style="max-width:320px;" class="text-truncate">@it.Message</td>
+                        <td>
+                            @if (it.Replied)
+                            {
+                                <span class="badge bg-success">Відповіли</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Без відповіді</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" asp-page="./Reply" asp-route-id="@it.Id">
+                                @(it.Replied ? "Переглянути" : "Відповісти")
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

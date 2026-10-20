@@ -1,0 +1,49 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Головна";
+}
+
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm text-center">
+    <div class="container-fluid py-3">
+        <h1 class="display-5 fw-bold text-dark">Ласкаво просимо до CarCatalog!</h1>
+        <p class="col-md-8 mx-auto fs-5 text-secondary">
+            Сучасний онлайн-сервіс для перегляду та підбору легкових автомобілів преміум-класу (Audi, Porsche, BMW, Dodge). 
+            Ознайомлюйтесь із характеристиками, переглядайте оцінки користувачів та залишайте власні відгуки.
+        </p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a asp-page="/Catalog/Index" class="btn btn-primary btn-lg px-4">Переглянути каталог</a>
+            <a asp-page="/Contact/Index" class="btn btn-outline-secondary btn-lg px-4">Зв’язатися з нами</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 text-center mt-2">
+    <div class="col-md-4">
+        <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="fs-1 text-primary mb-2">🚗</div>
+            <h4 class="fw-bold">Актуальний автопарк</h4>
+            <p class="text-muted">
+                Детальний опис кожної моделі, актуальні ціни, характеристики двигуна, типи кузова та якісні фотографії.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="fs-1 text-warning mb-2">⭐</div>
+            <h4 class="fw-bold">Оцінки та відгуки</h4>
+            <p class="text-muted">
+                Авторизовані користувачі можуть ставити оцінки за 5-бальною шкалою, а адміністрація надає офіційні відповіді на коментарі.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-4 border-0 shadow-sm">
+            <div class="fs-1 text-success mb-2">💬</div>
+            <h4 class="fw-bold">Підтримка клієнтів</h4>
+            <p class="text-muted">
+                Зручна контактна форма для ваших запитань і пропозицій з гарантованою відповіддю на електронну пошту.
+            </p>
+        </div>
+    </div>
+</div>
