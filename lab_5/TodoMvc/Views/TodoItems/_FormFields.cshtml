@@ -1,0 +1,26 @@
+@model TodoMvc.Models.TodoItem
+
+<div class="col-md-8">
+    <label asp-for="Title" class="form-label"></label>
+    <input asp-for="Title" class="form-control" />
+    <span asp-validation-for="Title" class="text-danger"></span>
+</div>
+<div class="col-md-4">
+    <label asp-for="Priority" class="form-label"></label>
+    <select asp-for="Priority" class="form-select"
+            asp-items="Html.GetEnumSelectList<TodoMvc.Models.Priority>()"></select>
+</div>
+<div class="col-12">
+    <label asp-for="Description" class="form-label"></label>
+    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Введіть детальний опис завдання (необов'язково)..."></textarea>
+    <span asp-validation-for="Description" class="text-danger"></span>
+</div>
+<div class="col-md-4">
+    <label asp-for="DueAt" class="form-label"></label>
+    <input asp-for="DueAt" class="form-control" />
+    <span asp-validation-for="DueAt" class="text-danger"></span>
+</div>
+<div class="col-md-4">
+    <label asp-for="IsDone" class="form-label"></label><br />
+    <input asp-for="IsDone" class="form-check-input" />
+</div>

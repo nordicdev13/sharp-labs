@@ -1,0 +1,120 @@
+@model IEnumerable<TodoMvc.Models.TodoItem>
+@using TodoMvc.Models
+@{
+    ViewData["Title"] = "Мої завдання";
+    var q = ViewBag.Q as string;
+    bool? showDone = ViewBag.ShowDone as bool?;
+    string sort = ViewBag.Sort as string ?? "created_desc";
+}
+
+<h1 class="mb-4">Мої завдання</h1>
+
+@* Кнопка «Додати завдання» розміщена над пошуком відповідно до завдання *@
+<div class="mb-3">
+    <a class="btn btn-success" asp-action="Create">
+        + Додати завдання
+    </a>
+</div>
+
+<form method="get" class="row g-2 mb-4 bg-light p-3 rounded border">
+    <div class="col-md-4">
+        <input name="q" value="@q" class="form-control" placeholder="Пошук за назвою або описом..." />
+    </div>
+    <div class="col-md-3">
+        <select name="showDone" class="form-select">
+            <option value="" selected="@(showDone is null ? "selected" : null)">Показати всі</option>
+            <option value="false" selected="@(showDone == false ? "selected" : null)">Тільки невиконані</option>
+            <option value="true" selected="@(showDone == true ? "selected" : null)">Тільки виконані</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="sort" class="form-select">
+            <option value="created_desc" selected="@(sort == "created_desc" ? "selected" : null)">Нові зверху</option>
+            <option value="created_asc"  selected="@(sort == "created_asc"  ? "selected" : null)">Старі зверху</option>
+            <option value="due_asc"      selected="@(sort == "due_asc"      ? "selected" : null)">Дедлайн ↑</option>
+            <option value="due_desc"     selected="@(sort == "due_desc"     ? "selected" : null)">Дедлайн ↓</option>
+            <option value="prio_asc"     selected="@(sort == "prio_asc"     ? "selected" : null)">Пріоритет ↑</option>
+            <option value="prio_desc"    selected="@(sort == "prio_desc"    ? "selected" : null)">Пріоритет ↓</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button class="btn btn-primary w-100" type="submit">Застосувати</button>
+        @if (!string.IsNullOrWhiteSpace(q) || showDone.HasValue || sort != "created_desc")
+        {
+            <a class="btn btn-outline-secondary" asp-action="Index" title="Скинути фільтри">✕</a>
+        }
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 80px;" class="text-center">Готово</th>
+                <th>Назва та опис</th>
+                <th style="width: 140px;">Дедлайн</th>
+                <th style="width: 130px;">Пріоритет</th>
+                <th style="width: 180px;" class="text-end">Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var t in Model)
+        {
+            var trClass = t.IsDone ? "table-success" : "";
+            <tr class="@trClass">
+                <td class="text-center">
+                    <form asp-action="Toggle" asp-route-id="@t.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-sm @(t.IsDone ? "btn-success" : "btn-outline-secondary")" type="submit" title="Змінити статус">
+                            @(t.IsDone ? "✓" : "—")
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <strong class="@(t.IsDone ? "text-decoration-line-through text-muted" : "")">@t.Title</strong>
+                    @if (!string.IsNullOrWhiteSpace(t.Description))
+                    {
+                        <div class="text-secondary small mt-1">@t.Description</div>
+                    }
+                    <div class="text-muted small mt-1">
+                        Створено: @t.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                    </div>
+                </td>
+                <td>
+                    @(t.DueAt?.ToString("yyyy-MM-dd") ?? "—")
+                </td>
+                <td>
+                    @switch (t.Priority)
+                    {
+                        case Priority.High:
+                            <span class="badge bg-danger">Високий</span>
+                            break;
+                        case Priority.Medium:
+                            <span class="badge bg-warning text-dark">Середній</span>
+                            break;
+                        case Priority.Low:
+                        default:
+                            <span class="badge bg-secondary">Низький</span>
+                            break;
+                    }
+                </td>
+                <td class="text-end">
+                    <div class="d-inline-flex gap-1">
+                        <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@t.Id">Змінити</a>
+                        <form asp-action="Delete" asp-route-id="@t.Id" method="post" class="d-inline"
+                              onsubmit="return confirm('Видалити завдання «@t.Title»?');">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-danger" type="submit">Видалити</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Немає завдань за обраними критеріями.</div>
+}

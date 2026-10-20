@@ -1,0 +1,23 @@
+@model TodoMvc.Models.TodoItem
+
+@{
+    ViewData["Title"] = "Редагування";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm p-4">
+    <form asp-action="Edit" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <partial name="_FormFields" model="Model" />
+        <div class="col-12 mt-4">
+            <button class="btn btn-primary" type="submit">Зберегти</button>
+            <a class="btn btn-secondary" asp-action="Index">Скасувати</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
