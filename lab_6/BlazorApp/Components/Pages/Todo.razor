@@ -1,0 +1,62 @@
+@page "/todo"
+@rendermode InteractiveServer
+
+<PageTitle>Todo</PageTitle>
+
+<div class="container py-2" style="max-width: 650px;">
+    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+        <h3 class="m-0">Todo (@todos.Count(todo => !todo.IsDone))</h3>
+        <span class="badge @(todos.Count(t => !t.IsDone) > 0 ? "bg-warning text-dark" : "bg-success") fs-6">
+            @(todos.Count(t => !t.IsDone) > 0 ? $"Невиконаних: {todos.Count(t => !t.IsDone)}" : "Все виконано! 🎉")
+        </span>
+    </div>
+
+    @if (todos.Count == 0)
+    {
+        <div class="alert alert-info">Список завдань порожній. Введіть назву та натисніть "Add todo".</div>
+    }
+    else
+    {
+        <ul class="list-group mb-4 shadow-sm">
+            @foreach (var todo in todos)
+            {
+                <li class="list-group-item d-flex align-items-center gap-3 @(todo.IsDone ? "bg-light" : "")">
+                    <input type="checkbox" class="form-check-input mt-0 fs-5" @bind="todo.IsDone" />
+                    <input class="form-control border-0 bg-transparent fs-5 @(todo.IsDone ? "text-decoration-line-through text-muted" : "")"
+                           @bind="todo.Title"
+                           placeholder="Назва завдання" />
+                </li>
+            }
+        </ul>
+    }
+
+    <div class="input-group shadow-sm">
+        <input class="form-control form-control-lg"
+               placeholder="Something to do"
+               @bind="newTodo"
+               @onkeyup="HandleKeyUp" />
+        <button class="btn btn-primary btn-lg px-4" @onclick="AddTodo">Add todo</button>
+    </div>
+</div>
+
+@code {
+    private List<TodoItem> todos = new();
+    private string? newTodo;
+
+    private void AddTodo()
+    {
+        if (!string.IsNullOrWhiteSpace(newTodo))
+        {
+            todos.Add(new TodoItem { Title = newTodo });
+            newTodo = string.Empty;
+        }
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            AddTodo();
+        }
+    }
+}
