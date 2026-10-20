@@ -1,0 +1,19 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Головна";
+}
+
+<div class="text-center my-5">
+    <h1 class="display-4 fw-bold">Лабораторна робота №3</h1>
+    <p class="lead text-secondary">
+        Вебзастосунок на ASP.NET Core Razor Pages: Авторизація та ролі (Identity), публічний каталог, завантаження фото авто та система відгуків
+    </p>
+    <div class="mt-4 d-flex justify-content-center gap-3">
+        <a asp-page="/Catalog/Index" class="btn btn-primary btn-lg px-4">Відкрити каталог авто</a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-page="/Cars/Index" class="btn btn-danger btn-lg px-4">Панель адміністратора</a>
+        }
+    </div>
+</div>

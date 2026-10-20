@@ -1,0 +1,142 @@
+@page "{id:int}"
+@model RazorPagesCar.Pages.Catalog.DetailsModel
+@{
+    ViewData["Title"] = $"{Model.Car?.Make} {Model.Car?.Model}";
+}
+
+<a asp-page="./Index" class="btn btn-outline-secondary mb-4">&larr; До каталогу авто</a>
+
+<div class="row g-4 align-items-start">
+    <div class="col-12 col-md-5 col-lg-4">
+        <img src="@(string.IsNullOrEmpty(Model.Car?.PosterPath) ? Url.Content("~/images/placeholder-poster.svg") : Url.Content(Model.Car!.PosterPath))"
+             alt="Фото @Model.Car?.Make @Model.Car?.Model"
+             class="img-fluid rounded shadow-sm w-100"
+             style="object-fit:cover; aspect-ratio: 4/3;" />
+    </div>
+
+    <div class="col-12 col-md-7 col-lg-8">
+        <h1 class="mb-2 fw-bold">@Model.Car?.Make @Model.Car?.Model</h1>
+        <div class="text-muted fs-5 mb-3">@Model.Car?.BodyType</div>
+
+        <div class="mb-3">
+            @if (Model.ReviewsCount > 0)
+            {
+                <span class="fs-4 text-warning fw-bold">★ @Model.AverageRating.ToString("0.0")</span>
+                <span class="text-muted ms-2">/ 5.0 (відгуків: @Model.ReviewsCount)</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary p-2">Ще немає оцінок</span>
+            }
+        </div>
+
+        <dl class="row border-top pt-3">
+            <dt class="col-sm-4">Марка</dt>
+            <dd class="col-sm-8">@Model.Car?.Make</dd>
+
+            <dt class="col-sm-4">Модель</dt>
+            <dd class="col-sm-8">@Model.Car?.Model</dd>
+
+            <dt class="col-sm-4">Рік випуску</dt>
+            <dd class="col-sm-8">@Model.Car?.Year</dd>
+
+            <dt class="col-sm-4">Тип кузова</dt>
+            <dd class="col-sm-8">@Model.Car?.BodyType</dd>
+
+            <dt class="col-sm-4">Колір</dt>
+            <dd class="col-sm-8">@(Model.Car?.Color ?? "Не вказано")</dd>
+
+            <dt class="col-sm-4">Ціна</dt>
+            <dd class="col-sm-8 fs-4 fw-bold text-success">@Model.Car?.Price.ToString("C0")</dd>
+        </dl>
+
+        <hr class="my-4" />
+
+        <h3 class="mb-3 fw-bold">Відгуки та оцінки</h3>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="card p-3 mb-4 shadow-sm bg-light border-0">
+                <h5 class="card-title fw-semibold">Залишити або оновити свій відгук</h5>
+                <form method="post" asp-page-handler="SaveReview">
+                    <input type="hidden" name="id" value="@Model.id" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ваша оцінка:</label>
+                        <div class="d-flex gap-3">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="rate-@i" name="MyRating" value="@i" @(Model.MyRating == i ? "checked" : "") />
+                                    <label class="form-check-label fw-bold" for="rate-@i">@i ★</label>
+                                </div>
+                            }
+                        </div>
+                        <span class="text-danger" asp-validation-for="MyRating"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="MyComment">Коментар (необов’язково):</label>
+                        <textarea id="MyComment" name="MyComment" class="form-control" rows="3" placeholder="Поділіться враженнями про цей автомобіль...">@Model.MyComment</textarea>
+                    </div>
+
+                    <button class="btn btn-primary px-4">Зберегти відгук</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <a asp-area="Identity" asp-page="/Account/Login" asp-route-ReturnUrl="@Url.Page("./Details", new { id = Model.id })" class="fw-bold">Увійдіть</a>, щоб поставити оцінку та залишити відгук.
+            </div>
+        }
+
+        @if (Model.ReviewsCount == 0)
+        {
+            <div class="text-muted fst-italic">Відгуків до цього автомобіля поки що немає. Будьте першим!</div>
+        }
+        else
+        {
+            <div class="list-group shadow-sm">
+                @foreach (var r in Model.Reviews)
+                {
+                    <div class="list-group-item p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>
+                                <strong class="text-primary">@(string.IsNullOrWhiteSpace(r.ReviewerName) ? "Користувач" : r.ReviewerName)</strong>
+                                <span class="ms-2 text-warning">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        @(i <= r.Rating ? "★" : "☆")
+                                    }
+                                </span>
+                            </div>
+                            <small class="text-muted">
+                                @((r.UpdatedAt ?? r.CreatedAt).ToLocalTime().ToString("yyyy-MM-dd HH:mm"))
+                            </small>
+                        </div>
+                        
+                        @if (!string.IsNullOrWhiteSpace(r.Comment))
+                        {
+                            <div class="mt-2 text-dark">@r.Comment</div>
+                        }
+
+                        @* Кнопка видалення: для автора відгуку або для Admin *@
+                        @if ((User.Identity?.IsAuthenticated ?? false) &&
+                             (User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == r.UserId))
+                        {
+                            <form method="post" asp-page-handler="DeleteReview" class="mt-2 text-end">
+                                <input type="hidden" name="reviewId" value="@r.Id" />
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Видалити відгук</button>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

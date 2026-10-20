@@ -1,0 +1,68 @@
+@page
+@model RazorPagesCar.Pages.Catalog.IndexModel
+@{
+    ViewData["Title"] = "Публічний каталог авто";
+}
+
+<h1 class="mb-4 fw-bold">Каталог автомобілів</h1>
+
+<form method="get" class="row g-2 mb-4 align-items-end p-3 bg-light rounded shadow-sm">
+    <div class="col-12 col-sm-6 col-md-5">
+        <label for="q" class="form-label fw-semibold">Пошук за назвою або моделлю</label>
+        <input id="q" name="q" value="@Model.q" class="form-control" placeholder="Напр., RS6, Challenger, BMW..." />
+    </div>
+    <div class="col-12 col-sm-4 col-md-3">
+        <label for="make" class="form-label fw-semibold">Марка</label>
+        <select id="make" asp-for="make" asp-items="Model.MakeOptions" class="form-select">
+            <option value="">Усі марки</option>
+        </select>
+    </div>
+    <div class="col-12 col-sm-2 col-md-2">
+        <button class="btn btn-primary w-100">Фільтрувати</button>
+    </div>
+    <div class="col-12 col-md-2">
+        <a class="btn btn-outline-secondary w-100" asp-page="./Index">Скинути</a>
+    </div>
+</form>
+
+@if (Model.Cars.Count == 0)
+{
+    <div class="alert alert-info">Нічого не знайдено за заданими критеріями пошуку.</div>
+}
+else
+{
+    <div class="text-muted small mb-3">
+        Знайдено автомобілів: <strong>@Model.Cars.Count</strong>
+        @if (!string.IsNullOrWhiteSpace(Model.make))
+        {
+            <span> • Марка: <strong>@Model.make</strong></span>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.q))
+        {
+            <span> • Пошук: <strong>@Model.q</strong></span>
+        }
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var c in Model.Cars)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 position-relative">
+                    <img src="@(string.IsNullOrEmpty(c.PosterPath) ? Url.Content("~/images/placeholder-poster.svg") : Url.Content(c.PosterPath))"
+                         class="card-img-top"
+                         alt="Фото @c.Make @c.Model"
+                         style="object-fit:cover; aspect-ratio: 16/10; height: 200px;" />
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title mb-1 fw-bold">@c.Make @c.Model</h5>
+                        <div class="text-muted small mb-2">@c.BodyType • @c.Color</div>
+                        <div class="mt-auto pt-2">
+                            <div class="small text-secondary">Рік випуску: <strong>@c.Year</strong></div>
+                            <div class="fs-5 fw-bold text-success mt-1">@c.Price.ToString("C0")</div>
+                            <a class="btn btn-outline-primary w-100 mt-3" asp-page="./Details" asp-route-id="@c.Id">Детальніше</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
