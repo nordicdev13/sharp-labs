@@ -1,0 +1,7 @@
+@using System.Globalization
+<span>@Amount.ToString("N2", CultureInfo.GetCultureInfo("uk-UA")) @Shop.CurrencySymbol</span>
+
+@code {
+    [Parameter] public decimal Amount { get; set; }
+    [CascadingParameter] public ShopSettings Shop { get; set; } = default!;
+}

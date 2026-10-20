@@ -1,0 +1,79 @@
+@page "/"
+@inject CatalogService Catalog
+@inject OrderState Order
+@inject ILogger<Home> Logger
+
+<PageTitle>Меню · Campus Café</PageTitle>
+
+<section class="hero">
+    <p class="eyebrow">LNTU · кава між парами</p>
+    <h1>Campus Café</h1>
+    <p>Оберіть напій, налаштуйте смак і зберіть своє замовлення.</p>
+</section>
+
+<div class="shop-grid">
+    <section aria-label="Каталог напоїв">
+        <div class="section-heading"><h2>Наше меню</h2><span>6 приводів зробити паузу</span></div>
+        @if (error is not null)
+        {
+            <p role="alert">@error</p>
+            <button type="button" @onclick="LoadAsync">Спробувати ще</button>
+        }
+        else if (drinks is null)
+        {
+            <p role="status">Завантаження меню…</p>
+        }
+        else if (drinks.Count == 0)
+        {
+            <p>Меню поки що порожнє.</p>
+        }
+        else
+        {
+            <div class="catalog">
+                @foreach (var drink in drinks)
+                {
+                    <DrinkCard @key="drink.Id" Drink="drink" OnSelect="SelectDrink" />
+                }
+            </div>
+        }
+    </section>
+    <CartSummary />
+</div>
+
+@if (selectedDrink is not null)
+{
+    <ConfigureDrinkDialog @key="selectedDrink.Id" Drink="selectedDrink"
+                          OnCancel="CloseDialog" OnConfirm="ConfirmDrink" />
+}
+
+@code {
+    private List<Drink>? drinks;
+    private Drink? selectedDrink;
+    private string? error;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        error = null;
+        drinks = null;
+        try
+        {
+            drinks = await Catalog.GetDrinksAsync();
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Не вдалося завантажити каталог");
+            error = "Не вдалося завантажити меню. Перевірте сервер і спробуйте ще раз.";
+        }
+    }
+
+    private void SelectDrink(Drink drink) => selectedDrink = drink;
+    private void CloseDialog() => selectedDrink = null;
+
+    private void ConfirmDrink(OrderLine line)
+    {
+        Order.Add(line);
+        CloseDialog();
+    }
+}

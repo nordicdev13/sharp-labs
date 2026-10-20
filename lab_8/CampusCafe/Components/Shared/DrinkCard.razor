@@ -1,0 +1,33 @@
+<article class="drink-card">
+    <div class="drink-art">
+        <svg viewBox="@CupViewBox" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet">
+            <image href="images/coffee-cups.jpg" width="1024" height="1386" />
+        </svg>
+        <strong class="price-badge">від <MoneyLabel Amount="Drink.BasePrice" /></strong>
+    </div>
+    <div class="card-body">
+        <h2>@Drink.Name</h2>
+        <p>@Drink.Description</p>
+        <div class="card-footer">
+            <span>Налаштуйте свій напій</span>
+            <button type="button" @onclick="SelectAsync" aria-label="@($"Налаштувати {Drink.Name}")">Обрати</button>
+        </div>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired] public Drink Drink { get; set; } = default!;
+    [Parameter] public EventCallback<Drink> OnSelect { get; set; }
+
+    private string CupViewBox => Drink.Name switch
+    {
+        "Капучино" => "520 15 235 225",
+        "Лате" => "300 15 235 225",
+        "Мокачино" => "520 295 235 225",
+        "Какао" => "60 1100 235 225",
+        "Матча-лате" => "60 295 235 225",
+        _ => "300 295 235 225"
+    };
+
+    private Task SelectAsync() => OnSelect.InvokeAsync(Drink);
+}

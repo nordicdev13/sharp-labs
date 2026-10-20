@@ -1,0 +1,45 @@
+<div class="modal-backdrop">
+    <section class="configure-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+        <header>
+            <span class="eyebrow">Ваш напій · ваш смак</span>
+            <h2 id="dialog-title">@Drink.Name</h2>
+            <p>@Drink.Description</p>
+        </header>
+        <div class="dialog-fields">
+            <label for="volume">Об’єм</label>
+            <select id="volume" @bind="draft.Volume">
+                <option value="250">250 мл — базова ціна</option>
+                <option value="350">350 мл — +15 ₴</option>
+                <option value="450">450 мл — +25 ₴</option>
+            </select>
+
+            <label for="milk">Молоко</label>
+            <select id="milk" @bind="draft.Milk">
+                <option value="@MilkKind.Regular">Звичайне — без доплати</option>
+                <option value="@MilkKind.Oat">Вівсяне — +20 ₴</option>
+            </select>
+
+            <label for="quantity">Кількість: @draft.Quantity</label>
+            <input id="quantity" type="range" min="1" max="10" step="1"
+                   @bind="draft.Quantity" @bind:event="oninput" />
+
+            <div class="price-preview" aria-live="polite">
+                <span>За один: <MoneyLabel Amount="draft.GetUnitPrice(Drink)" /></span>
+                <strong>Разом: <MoneyLabel Amount="@(draft.GetUnitPrice(Drink) * draft.Quantity)" /></strong>
+            </div>
+        </div>
+        <footer>
+            <button type="button" class="secondary" @onclick="OnCancel">Скасувати</button>
+            <button type="button" @onclick="ConfirmAsync">Додати до кошика</button>
+        </footer>
+    </section>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public Drink Drink { get; set; } = default!;
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback<OrderLine> OnConfirm { get; set; }
+    private readonly DrinkDraft draft = new();
+
+    private Task ConfirmAsync() => OnConfirm.InvokeAsync(draft.CreateLine(Drink));
+}
