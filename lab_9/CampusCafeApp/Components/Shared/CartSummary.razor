@@ -1,0 +1,40 @@
+@implements IDisposable
+@inject OrderState Order
+
+<aside class="cart" aria-label="Кошик">
+    <span class="eyebrow">Ваша перерва</span>
+    <h2>Кошик <span class="count">@Order.Count</span></h2>
+    @if (Order.Items.Count == 0)
+    {
+        <p class="empty-cart">Оберіть напій у каталозі.<br />Він з’явиться тут після підтвердження.</p>
+    }
+    else
+    {
+        <ul class="cart-items">
+            @foreach (var item in Order.Items)
+            {
+                <li @key="item.Id">
+                    <strong>@item.DrinkName</strong>
+                    <p>@item.Volume мл · @item.Milk молоко · @item.Quantity шт.</p>
+                    <div class="cart-line-footer">
+                        <MoneyLabel Amount="item.Total" />
+                        <button type="button" class="text-button" @onclick="() => Order.Remove(item.Id)"
+                                aria-label="@($"Видалити {item.DrinkName}")">Видалити</button>
+                    </div>
+                </li>
+            }
+        </ul>
+        <div class="cart-total" aria-live="polite">
+            <span>До сплати</span><strong><MoneyLabel Amount="Order.Total" /></strong>
+        </div>
+        <button type="button" class="secondary full-width" @onclick="Order.Clear">Очистити кошик</button>
+        <a class="button-link checkout-link" href="/checkout">Перевірити замовлення</a>
+    }
+    <p class="cart-note">Кошик тимчасовий. Замовлення зберігається після підтвердження на окремій сторінці. Оплати немає.</p>
+</aside>
+
+@code {
+    protected override void OnInitialized() => Order.Changed += Refresh;
+    private void Refresh() => _ = InvokeAsync(StateHasChanged);
+    public void Dispose() => Order.Changed -= Refresh;
+}

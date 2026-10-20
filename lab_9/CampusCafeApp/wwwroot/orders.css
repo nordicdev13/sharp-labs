@@ -1,0 +1,10 @@
+.panel { background:#fff; border-radius:8px; padding:24px; margin:20px 0; box-shadow:0 2px 7px #0002; }
+.review-lines { list-style:none; padding:0; }
+.review-lines li { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; padding:14px 0; border-bottom:1px solid #ddd; }
+.review-lines li span { color:#555; }
+.review-total { font-size:1.3rem; font-weight:700; }
+.orders-list { max-width:850px; }
+.checkout-link { display:block; margin-top:14px; text-align:center; }
+.back-link { display:inline-block; margin:18px; }
+button:disabled { opacity:.55; cursor:not-allowed; }
+nav { flex-wrap:wrap; }
