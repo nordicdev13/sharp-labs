@@ -1,0 +1,61 @@
+@page "/"
+<PageTitle>Каталог · Campus Café</PageTitle>
+
+<section class="hero">
+    <p class="eyebrow">LNTU · кава між парами</p>
+    <h1>Campus Café</h1>
+    <p>Оберіть напій і налаштуйте його. Поки що зберігаємо лише останній вибір.</p>
+</section>
+
+<div class="catalog">
+    @foreach (var drink in drinks)
+    {
+        <DrinkCard @key="drink.Id" Drink="drink" OnSelect="SelectDrink" />
+    }
+</div>
+
+<section class="last-selection-section" aria-live="polite">
+    <h2>Останній підтверджений вибір</h2>
+    @if (lastSelection is null)
+    {
+        <p>Ви ще нічого не підтвердили.</p>
+    }
+    else
+    {
+        <div class="last-selection-card">
+            <p class="m-0"><strong>@lastSelection.DrinkName</strong> · @lastSelection.Volume мл · @lastSelection.Milk молоко · @lastSelection.Quantity шт.</p>
+            <div class="last-selection-price">
+                <span>Сума:</span>
+                <strong><MoneyLabel Amount="lastSelection.Total" /></strong>
+            </div>
+        </div>
+    }
+</section>
+
+@if (selectedDrink is not null)
+{
+    <ConfigureDrinkDialog @key="selectedDrink.Id" Drink="selectedDrink"
+                          OnCancel="CloseDialog" OnConfirm="ConfirmDrink" />
+}
+
+@code {
+    private Drink? selectedDrink;
+    private OrderLine? lastSelection;
+    private readonly List<Drink> drinks = new()
+    {
+        new() { Id = 1, Name = "Капучино", Description = "Еспресо, молоко та ніжна пінка.", BasePrice = 65m },
+        new() { Id = 2, Name = "Лате", Description = "М’який смак і більше молока.", BasePrice = 70m },
+        new() { Id = 3, Name = "Мокачино", Description = "Кава з шоколадом.", BasePrice = 85m },
+        new() { Id = 4, Name = "Матча-лате", Description = "Зелений чай матча з молоком.", BasePrice = 90m },
+        new() { Id = 5, Name = "Какао", Description = "Шоколадний напій без кави.", BasePrice = 60m },
+        new() { Id = 6, Name = "Чай-лате", Description = "Пряний чай із молоком.", BasePrice = 75m }
+    };
+
+    private void SelectDrink(Drink drink) => selectedDrink = drink;
+    private void CloseDialog() => selectedDrink = null;
+    private void ConfirmDrink(OrderLine line)
+    {
+        lastSelection = line;
+        CloseDialog();
+    }
+}

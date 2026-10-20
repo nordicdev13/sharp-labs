@@ -1,0 +1,6 @@
+@using System.Globalization
+<span>@Amount.ToString("N2", CultureInfo.GetCultureInfo("uk-UA")) ₴</span>
+
+@code {
+    [Parameter] public decimal Amount { get; set; }
+}

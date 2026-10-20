@@ -1,0 +1,16 @@
+@inherits LayoutComponentBase
+
+<header class="site-header">
+    <a class="brand" href="/">☕ Campus Café</a>
+    <nav aria-label="Основна навігація">
+        <NavLink href="/" Match="NavLinkMatch.All">Каталог</NavLink>
+    </nav>
+</header>
+<main class="page-shell">@Body</main>
+<footer class="site-footer">Навчальний проєкт LNTU · Ціни у гривнях</footer>
+
+<div id="blazor-error-ui" data-nosnippet>
+    Роботу застосунку перервано.
+    <a href="." class="reload">Перезавантажити сторінку</a>
+    <span class="dismiss">×</span>
+</div>
