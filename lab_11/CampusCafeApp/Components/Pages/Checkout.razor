@@ -1,0 +1,84 @@
+@page "/checkout"
+@implements IDisposable
+@inject OrderState Cart
+@inject PurchaseService Purchases
+@inject NavigationManager Navigation
+@inject ILogger<Checkout> Logger
+
+<PageTitle>Оформлення замовлення</PageTitle>
+<h1>Оформлення замовлення</h1>
+<p>Використовуйте лише вигадані навчальні дані. Оплата не проводиться.</p>
+@if (Cart.Items.Count == 0)
+{
+    <p>Кошик порожній. <a href="/">Повернутися до каталогу</a></p>
+}
+else
+{
+    <EditForm EditContext="editContext" OnValidSubmit="PlaceOrderAsync"
+              OnInvalidSubmit="ShowInvalid" FormName="checkout">
+        <DataAnnotationsValidator />
+        <div class="checkout-grid">
+            <section class="panel">
+                <h2>Ваш вибір</h2>
+                <OrderReview Items="Cart.Items" />
+            </section>
+            <section class="panel">
+                <h2>Дані покупця</h2>
+                <fieldset disabled="@isSubmitting">
+                    <CustomerFields Input="input" />
+                </fieldset>
+                <ValidationSummary />
+                @if (error is not null) { <p role="alert" class="validation-message">@error</p> }
+                <p class="form-hint">@(hasChanges ? "Ви змінили дані форми." : "Заповніть форму.")</p>
+                <button type="submit" disabled="@isSubmitting">
+                    @(isSubmitting ? "Збереження…" : "Підтвердити замовлення")
+                </button>
+            </section>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private readonly CheckoutInput input = new();
+    private EditContext editContext = default!;
+    private bool hasChanges;
+    private bool isSubmitting;
+    private string? error;
+    private readonly Guid requestId = Guid.NewGuid();
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(input);
+        editContext.OnFieldChanged += FieldChanged;
+    }
+
+    private void FieldChanged(object? sender, FieldChangedEventArgs args)
+    {
+        hasChanges = editContext.IsModified();
+        error = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+    private void ShowInvalid(EditContext _) => error = "Виправте позначені поля та повторіть спробу.";
+
+    private async Task PlaceOrderAsync()
+    {
+        if (isSubmitting) return;
+        isSubmitting = true;
+        error = null;
+        try
+        {
+            var id = await Purchases.PlaceAsync(Cart.Items.ToArray(), requestId, input);
+            Cart.Clear();
+            Navigation.NavigateTo($"/orders/{id}");
+        }
+        catch (ArgumentException ex) { error = ex.Message; }
+        catch (InvalidOperationException ex) { error = ex.Message; }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Помилка збереження замовлення");
+            error = "Не вдалося зберегти замовлення. Кошик не очищено. Спробуйте ще раз.";
+        }
+        finally { isSubmitting = false; }
+    }
+    public void Dispose() => editContext.OnFieldChanged -= FieldChanged;
+}

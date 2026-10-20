@@ -1,0 +1,74 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="order-tools">
+    <button type="button" disabled="@(module is null || busy)" @onclick="CopyAsync">Копіювати підсумок</button>
+    <p role="status">@message</p>
+    @if (showFallback)
+    {
+        <label for="copy-fallback">Скопіюйте текст вручну</label>
+        <textarea id="copy-fallback" readonly rows="4" value="@Summary"></textarea>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Summary { get; set; } = "";
+    private IJSObjectReference? module;
+    private DotNetObjectReference<OrderTools>? receiver;
+    private bool busy;
+    private bool disposed;
+    private bool showFallback;
+    private string? message;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try
+        {
+            var imported = await JS.InvokeAsync<IJSObjectReference>("import", "./js/orderTools.js");
+            if (disposed) { await imported.DisposeAsync(); return; }
+            module = imported;
+            receiver = DotNetObjectReference.Create(this);
+        }
+        catch (JSException) { message = "Модуль не завантажено. Скористайтеся текстовим підсумком."; showFallback = true; }
+        catch (JSDisconnectedException) { return; }
+        if (!disposed) StateHasChanged();
+    }
+
+    private async Task CopyAsync()
+    {
+        if (module is null || receiver is null || busy) return;
+        busy = true;
+        showFallback = false;
+        try
+        {
+            if (!await module.InvokeAsync<bool>("copySummary", Summary, receiver))
+            {
+                message = "Браузер не дозволив копіювання. Виділіть текст нижче.";
+                showFallback = true;
+            }
+        }
+        catch (JSException) { message = "Помилка JavaScript. Скопіюйте текст вручну."; showFallback = true; }
+        catch (JSDisconnectedException) { }
+        finally { busy = false; }
+    }
+
+    [JSInvokable]
+    public Task OnCopied() => InvokeAsync(() =>
+    {
+        if (disposed) return;
+        message = "Підсумок скопійовано.";
+        StateHasChanged();
+    });
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+        receiver?.Dispose();
+        if (module is not null)
+        {
+            try { await module.DisposeAsync(); }
+            catch (JSDisconnectedException) { }
+        }
+    }
+}

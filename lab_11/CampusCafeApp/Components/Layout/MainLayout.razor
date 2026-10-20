@@ -1,0 +1,24 @@
+@inherits LayoutComponentBase
+
+<CascadingValue Value="settings" IsFixed="true">
+    <header class="site-header">
+        <a class="brand" href="/" aria-label="Campus Café — головна"><span aria-hidden="true">☕</span> @settings.Name</a>
+        <nav aria-label="Основна навігація">
+            <NavLink href="/" Match="NavLinkMatch.All">Меню</NavLink>
+            <NavLink href="/orders">Замовлення</NavLink>
+            <NavLink href="/about">Про кав’ярню</NavLink>
+        </nav>
+    </header>
+    <main class="page-shell">@Body</main>
+    <footer class="site-footer">Campus Café · Навчальний проєкт LNTU · Ціни у гривнях</footer>
+</CascadingValue>
+
+<div id="blazor-error-ui" data-nosnippet>
+    З’єднання або роботу застосунку перервано.
+    <a href="." class="reload">Перезавантажити сторінку</a>
+    <span class="dismiss">×</span>
+</div>
+
+@code {
+    private readonly ShopSettings settings = new();
+}

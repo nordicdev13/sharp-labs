@@ -1,0 +1,33 @@
+<div class="form-fields">
+    <label for="customer-name">Ім’я</label>
+    <InputText id="customer-name" @ref="nameInput" @bind-Value="Input.Name" autocomplete="off" />
+    <ValidationMessage For="@(() => Input.Name)" />
+    <label for="customer-phone">Телефон</label>
+    <InputText id="customer-phone" @bind-Value="Input.Phone" type="tel" placeholder="+380…" autocomplete="off" />
+    <ValidationMessage For="@(() => Input.Phone)" />
+    <label for="fulfillment">Спосіб отримання</label>
+    <InputSelect id="fulfillment" @bind-Value="Input.Fulfillment">
+        <option value="@FulfillmentKind.Pickup">Самовивіз</option>
+        <option value="@FulfillmentKind.Delivery">Доставка</option>
+    </InputSelect>
+    <ValidationMessage For="@(() => Input.Fulfillment)" />
+    @if (Input.Fulfillment == FulfillmentKind.Delivery)
+    {
+        <label for="customer-address">Адреса доставки</label>
+        <InputText id="customer-address" @bind-Value="Input.Address" autocomplete="off" />
+        <ValidationMessage For="@(() => Input.Address)" />
+    }
+    <label for="customer-comment">Коментар</label>
+    <InputTextArea id="customer-comment" @bind-Value="Input.Comment" rows="3" />
+    <ValidationMessage For="@(() => Input.Comment)" />
+</div>
+
+@code {
+    [Parameter, EditorRequired] public CheckoutInput Input { get; set; } = default!;
+    private InputText? nameInput;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && nameInput?.Element is { } element)
+            await element.FocusAsync();
+    }
+}

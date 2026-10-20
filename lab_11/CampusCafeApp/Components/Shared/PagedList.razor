@@ -1,0 +1,34 @@
+@typeparam TItem
+
+@if (Items.Count == 0)
+{
+    @EmptyContent
+}
+else
+{
+    @foreach (var item in Items.Skip(page * PageSize).Take(PageSize))
+    {
+        @ItemTemplate(item)
+    }
+    <nav class="pager" aria-label="Сторінки списку">
+        <button type="button" disabled="@(page == 0)" @onclick="Previous">Назад</button>
+        <span>Сторінка @(page + 1) із @PageCount</span>
+        <button type="button" disabled="@(page >= PageCount - 1)" @onclick="Next">Далі</button>
+    </nav>
+}
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<TItem> Items { get; set; } = Array.Empty<TItem>();
+    [Parameter, EditorRequired] public RenderFragment<TItem> ItemTemplate { get; set; } = default!;
+    [Parameter] public RenderFragment? EmptyContent { get; set; }
+    [Parameter] public int PageSize { get; set; } = 3;
+    private int page;
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(Items.Count / (double)PageSize));
+    protected override void OnParametersSet()
+    {
+        if (PageSize <= 0) throw new ArgumentOutOfRangeException(nameof(PageSize));
+        page = Math.Clamp(page, 0, PageCount - 1);
+    }
+    private void Previous() => page = Math.Max(0, page - 1);
+    private void Next() => page = Math.Min(PageCount - 1, page + 1);
+}

@@ -1,0 +1,45 @@
+@page "/orders"
+@inject PurchaseService Purchases
+@inject ILogger<Orders> Logger
+
+<PageTitle>Навчальні замовлення</PageTitle>
+<h1>Навчальні замовлення</h1>
+<p>Це спільний демонстраційний список без облікових записів. Не вводьте реальні персональні дані.</p>
+@if (error is not null)
+{
+    <p role="alert">@error</p>
+    <button @onclick="LoadAsync">Повторити</button>
+}
+else if (orders is null) { <p role="status">Завантаження…</p> }
+else if (orders.Count == 0) { <p>Замовлень ще немає. <a href="/">Відкрити каталог</a></p> }
+else
+{
+    <div class="orders-list">
+        <PagedList TItem="PurchaseOrder" Items="orders" PageSize="3">
+            <ItemTemplate Context="order">
+                <article class="panel" @key="order.Id">
+                    <h2><a href="@($"/orders/{order.Id}")">Замовлення №@order.Id</a></h2>
+                    <p>@order.CreatedUtc.ToString("dd.MM.yyyy HH:mm") UTC · @order.Items.Sum(i => i.Quantity) шт.</p>
+                    <MoneyLabel Amount="order.Total" />
+                </article>
+            </ItemTemplate>
+        </PagedList>
+    </div>
+}
+
+@code {
+    private List<PurchaseOrder>? orders;
+    private string? error;
+    protected override Task OnInitializedAsync() => LoadAsync();
+    private async Task LoadAsync()
+    {
+        error = null;
+        orders = null;
+        try { orders = await Purchases.GetAllAsync(); }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Не вдалося отримати замовлення");
+            error = "Не вдалося отримати список. Перевірте сервер.";
+        }
+    }
+}

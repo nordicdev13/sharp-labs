@@ -1,0 +1,42 @@
+@implements IAsyncDisposable
+
+<div class="status-panel" role="status">
+    <strong>@status</strong>
+    <p>Навчальна імітація: 0–15 с — прийнято; 15–30 с — готується; далі — готове.</p>
+    <small>Це не реальне відстеження кухні чи доставки. Перевірка кожні 3 секунди.</small>
+</div>
+
+@code {
+    [Parameter] public DateTime CreatedUtc { get; set; }
+    private readonly CancellationTokenSource stop = new();
+    private Task? loop;
+    private string status = "";
+
+    protected override void OnInitialized()
+    {
+        UpdateStatus();
+        loop = RunAsync();
+    }
+    private void UpdateStatus() => status = DemoOrderProgress.GetStatus(CreatedUtc, DateTime.UtcNow);
+
+    private async Task RunAsync()
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
+        try
+        {
+            while (!DemoOrderProgress.IsComplete(CreatedUtc, DateTime.UtcNow)
+                && await timer.WaitForNextTickAsync(stop.Token))
+            {
+                await InvokeAsync(() => { UpdateStatus(); StateHasChanged(); });
+            }
+        }
+        catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        stop.Cancel();
+        if (loop is not null) await loop;
+        stop.Dispose();
+    }
+}
